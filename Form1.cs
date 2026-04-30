@@ -25,27 +25,42 @@ namespace SimplePaint
         {
             InitializeComponent();
 
-            // 캔버스초기화
+            // 1. 초기 비트맵 설정
             canvasBitmap = new Bitmap(picCanvas.Width, picCanvas.Height);
             canvasGraphics = Graphics.FromImage(canvasBitmap);
-            canvasGraphics.Clear(Color.White);   // 캔버스를흰색으로초기화
+            canvasGraphics.Clear(Color.White);
+            picCanvas.Image = canvasBitmap;
 
-            picCanvas.Image = canvasBitmap;   // 그린그림을화면(PictureBox)에 표시
+            // picCanvas의 부모를 panelCanvas로 명시적 지정 (자식으로 넣기)
+            picCanvas.Parent = panelCanvas;
 
-            // 2. 마우스 이벤트 연결
+            // 부모 안에서의 위치와 속성 초기화
+            picCanvas.Location = new Point(0, 0);
+            picCanvas.Dock = DockStyle.None;
+
+            // 패널 스크롤 켜기
+            panelCanvas.AutoScroll = true;
+
+            // 3. 마우스 이벤트 연결 (휠 이벤트 추가)
             picCanvas.MouseDown += picCanvas_MouseDown;
             picCanvas.MouseMove += picCanvas_MouseMove;
             picCanvas.MouseUp += picCanvas_MouseUp;
-
-            // 3. Paint 이벤트 연결
             picCanvas.Paint += picCanvas_Paint;
 
-            // 4. 도형 선택 버튼 이벤트 연결
+            
+
+            // 4. 나머지 버튼 이벤트 (주석 해제)
             btnLine.Click += btnLine_Click;
             btnRectangle.Click += btnRectangle_Click;
             btnCircle.Click += btnCircle_Click;
-            //btnSaveFile.Click += btnSaveFile_Click;
-            //btnOpenFile.Click += btnOpenFile_Click;
+            btnSaveFile.Click += btnSaveFile_Click;
+            btnOpenFile.Click += btnOpenFile_Click;
+            picCanvas.Image = canvasBitmap;
+            picCanvas.BringToFront(); // 이 줄을 추가하여 다른 컨트롤보다 앞으로 가져옵니다.
+            panelCanvas.AutoScroll = true;
+            picCanvas.Invalidate();
+            picCanvas.Location = new Point(0, 0); // 좌표를 패널의 왼쪽 상단으로 고정
+            picCanvas.SizeMode = PictureBoxSizeMode.AutoSize;
 
 
             // --- 색상 콤보박스 설정 및 이벤트 연결 ---
@@ -178,46 +193,61 @@ namespace SimplePaint
             currentLineWidth = trbLineWidth.Value;
         }
 
+        private float zoomFactor = 1.0f;
         private void btnOpenFile_Click(object sender, EventArgs e)
         {
-            // 이미지 파일을 선택하기 위한 대화상자 생성 및 필터 설정
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
                 openFileDialog.Filter = "Image Files|*.png;*.jpg;*.jpeg;*.bmp";
-                openFileDialog.Title = "이미지 불러오기";
-
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     try
                     {
-                        // 선택한 경로에서 이미지를 메모리로 읽어옴
-                        Image loadedImage = Image.FromFile(openFileDialog.FileName);
-
-                        // 기존 캔버스 리소스를 해제하여 메모리 누수 방지
-                        if (canvasBitmap != null)
+                        // 파일을 잠그지 않고 읽기 위해 스트림 방식으로 복사
+                        using (Image tempImage = Image.FromFile(openFileDialog.FileName))
                         {
-                            canvasGraphics.Dispose();
-                            canvasBitmap.Dispose();
+                            if (canvasBitmap != null)
+                            {
+                                canvasGraphics.Dispose();
+                                canvasBitmap.Dispose();
+                            }
+
+                            // 1. 이미지 크기에 맞춰 캔버스(비트맵) 크기 조정
+                            canvasBitmap = new Bitmap(tempImage.Width, tempImage.Height);
+                            canvasGraphics = Graphics.FromImage(canvasBitmap);
+                            canvasGraphics.DrawImage(tempImage, 0, 0);
                         }
 
-                        // 불러온 이미지의 크기와 동일한 새로운 비트맵 생성
-                        canvasBitmap = new Bitmap(loadedImage.Width, loadedImage.Height);
-                        canvasGraphics = Graphics.FromImage(canvasBitmap);
+                        // 2. UI 및 스크롤 설정
+                        zoomFactor = 1.0f; // 배율 초기화
+                        UpdateCanvasUI();
 
-                        // 새 비트맵 위에 불러온 이미지를 그림
-                        canvasGraphics.DrawImage(loadedImage, 0, 0);
-
-                        // 화면(PictureBox)에 업데이트 및 원본 이미지 리소스 해제
-                        picCanvas.Image = canvasBitmap;
-                        loadedImage.Dispose();
+                        MessageBox.Show("이미지를 불러왔습니다.");
                     }
                     catch (Exception ex)
                     {
-                        // 파일 형식 오류나 접근 권한 문제 발생 시 메시지 출력
-                        MessageBox.Show("이미지 로드 실패: " + ex.Message, "오류");
+                        MessageBox.Show("오류: " + ex.Message);
                     }
                 }
             }
+        }
+
+        // 3. 확대/축소 및 UI 업데이트 핵심 로직
+        private void UpdateCanvasUI()
+        {
+            if (canvasBitmap == null) return;
+
+            // 배율에 맞춰 PictureBox 크기 조정
+            picCanvas.Width = (int)(canvasBitmap.Width * zoomFactor);
+            picCanvas.Height = (int)(canvasBitmap.Height * zoomFactor);
+
+            // PictureBox 모드를 설정하여 이미지가 배율에 맞게 늘어나거나 줄어들게 함
+            picCanvas.SizeMode = PictureBoxSizeMode.Zoom;
+            picCanvas.Image = canvasBitmap;
+
+            // 패널 내부에서 중앙/좌측 상단 배치 및 스크롤 활성화
+            picCanvas.Location = new Point(0, 0);
+            panelCanvas.AutoScroll = true;
         }
 
         private void btnSaveFile_Click(object sender, EventArgs e)
@@ -266,6 +296,16 @@ namespace SimplePaint
                     }
                 }
             }
+        }
+
+        private void picCanvas_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void panelCanvas_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }
