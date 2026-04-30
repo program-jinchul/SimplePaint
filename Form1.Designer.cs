@@ -153,6 +153,7 @@
             btnOpenFile.TabIndex = 4;
             btnOpenFile.Text = "열기";
             btnOpenFile.UseVisualStyleBackColor = false;
+            btnOpenFile.Click += btnOpenFile_Click;
             // 
             // btnSaveFile
             // 
@@ -164,6 +165,7 @@
             btnSaveFile.TabIndex = 5;
             btnSaveFile.Text = "저장";
             btnSaveFile.UseVisualStyleBackColor = false;
+            btnSaveFile.Click += btnSaveFile_Click;
             // 
             // picCanvas
             // 

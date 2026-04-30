@@ -44,9 +44,10 @@ namespace SimplePaint
             btnLine.Click += btnLine_Click;
             btnRectangle.Click += btnRectangle_Click;
             btnCircle.Click += btnCircle_Click;
+            btnSaveFile.Click += btnSaveFile_Click;
 
             // --- 색상 콤보박스 설정 및 이벤트 연결 ---
-            cmbColor.Items.AddRange(new object[] {  }); // 예시: 항목이 없을 경우 추가
+            cmbColor.Items.AddRange(new object[] { }); // 예시: 항목이 없을 경우 추가
             cmbColor.SelectedIndexChanged += cmbColor_SelectedIndexChanged;
             cmbColor.SelectedIndex = 0;  // 기본값: Black
 
@@ -55,6 +56,7 @@ namespace SimplePaint
             trbLineWidth.Maximum = 15;   // 최대값
             trbLineWidth.Value = 2;      // 기본값
             trbLineWidth.ValueChanged += trbLineWidth_ValueChanged;
+
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -152,26 +154,52 @@ namespace SimplePaint
             switch (cmbColor.SelectedIndex)
             {
                 case 0: // Black 검정
-                    currentColor= Color.Black;
+                    currentColor = Color.Black;
                     break;
                 case 1: // Red 빨강
-                    currentColor= Color.Red;
+                    currentColor = Color.Red;
                     break;
                 case 2: // Blue 파랑
-                    currentColor= Color.Blue;
+                    currentColor = Color.Blue;
                     break;
                 case 3: // Green 녹색
-                    currentColor= Color.Green;
+                    currentColor = Color.Green;
                     break;
                 default:
-                    currentColor= Color.Black;
+                    currentColor = Color.Black;
                     break;
             }
         }
 
-        private void trbLineWidth_ValueChanged(object sender, EventArgs e) 
-        { 
-            currentLineWidth = trbLineWidth.Value; 
+        private void trbLineWidth_ValueChanged(object sender, EventArgs e)
+        {
+            currentLineWidth = trbLineWidth.Value;
+        }
+
+        private void btnOpenFile_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnSaveFile_Click(object sender, EventArgs e)
+        {
+            // SaveFileDialog 객체 생성[cite: 2]
+            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+            {
+                // 파일 필터 설정 (사용자가 선택할 수 있는 확장자 제한)
+                saveFileDialog.Filter = "PNG Image|*.png|JPeg Image|*.jpg|Bitmap Image|*.bmp";
+                saveFileDialog.Title = "그림 저장하기";
+                saveFileDialog.FileName = "SimplePaint_Image"; // 기본 파일 이름
+
+                // 사용자가 '확인'을 눌렀을 때만 로직 실행[cite: 2]
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    
+                    // 현재는 경로가 정상적으로 잡히는지 메시지 박스로 확인합니다.
+                    string filePath = saveFileDialog.FileName;
+                    MessageBox.Show($"{filePath}에 저장을 준비합니다.", "저장 대화상자 확인");
+                }
+            }
         }
     }
 }
