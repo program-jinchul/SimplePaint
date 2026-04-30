@@ -45,6 +45,7 @@ namespace SimplePaint
             btnRectangle.Click += btnRectangle_Click;
             btnCircle.Click += btnCircle_Click;
             //btnSaveFile.Click += btnSaveFile_Click;
+            //btnOpenFile.Click += btnOpenFile_Click;
 
 
             // --- 색상 콤보박스 설정 및 이벤트 연결 ---
@@ -179,7 +180,44 @@ namespace SimplePaint
 
         private void btnOpenFile_Click(object sender, EventArgs e)
         {
+            // 이미지 파일을 선택하기 위한 대화상자 생성 및 필터 설정
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "Image Files|*.png;*.jpg;*.jpeg;*.bmp";
+                openFileDialog.Title = "이미지 불러오기";
 
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        // 선택한 경로에서 이미지를 메모리로 읽어옴
+                        Image loadedImage = Image.FromFile(openFileDialog.FileName);
+
+                        // 기존 캔버스 리소스를 해제하여 메모리 누수 방지
+                        if (canvasBitmap != null)
+                        {
+                            canvasGraphics.Dispose();
+                            canvasBitmap.Dispose();
+                        }
+
+                        // 불러온 이미지의 크기와 동일한 새로운 비트맵 생성
+                        canvasBitmap = new Bitmap(loadedImage.Width, loadedImage.Height);
+                        canvasGraphics = Graphics.FromImage(canvasBitmap);
+
+                        // 새 비트맵 위에 불러온 이미지를 그림
+                        canvasGraphics.DrawImage(loadedImage, 0, 0);
+
+                        // 화면(PictureBox)에 업데이트 및 원본 이미지 리소스 해제
+                        picCanvas.Image = canvasBitmap;
+                        loadedImage.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+                        // 파일 형식 오류나 접근 권한 문제 발생 시 메시지 출력
+                        MessageBox.Show("이미지 로드 실패: " + ex.Message, "오류");
+                    }
+                }
+            }
         }
 
         private void btnSaveFile_Click(object sender, EventArgs e)
