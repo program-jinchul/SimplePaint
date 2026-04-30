@@ -64,7 +64,7 @@
             groupBox1.Controls.Add(btnCircle);
             groupBox1.Controls.Add(btnRectangle);
             groupBox1.Controls.Add(btnLine);
-            groupBox1.Location = new Point(12, 108);
+            groupBox1.Location = new Point(18, 108);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(343, 155);
             groupBox1.TabIndex = 1;
@@ -81,6 +81,7 @@
             btnCircle.Text = "원";
             btnCircle.TextAlign = ContentAlignment.BottomCenter;
             btnCircle.UseVisualStyleBackColor = true;
+            btnCircle.Click += btnCircle_Click;
             // 
             // btnRectangle
             // 
@@ -92,6 +93,7 @@
             btnRectangle.Text = "사각형";
             btnRectangle.TextAlign = ContentAlignment.BottomCenter;
             btnRectangle.UseVisualStyleBackColor = true;
+            btnRectangle.Click += btnRectangle_Click;
             // 
             // btnLine
             // 
@@ -103,13 +105,14 @@
             btnLine.Text = "직선";
             btnLine.TextAlign = ContentAlignment.BottomCenter;
             btnLine.UseVisualStyleBackColor = true;
+            btnLine.Click += btnLine_Click;
             // 
             // groupBox2
             // 
             groupBox2.Controls.Add(cmbColor);
-            groupBox2.Location = new Point(378, 108);
+            groupBox2.Location = new Point(380, 108);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(254, 155);
+            groupBox2.Size = new Size(251, 155);
             groupBox2.TabIndex = 2;
             groupBox2.TabStop = false;
             groupBox2.Text = "색 선택";
@@ -126,7 +129,7 @@
             // groupBox3
             // 
             groupBox3.Controls.Add(trbLineWidth);
-            groupBox3.Location = new Point(655, 108);
+            groupBox3.Location = new Point(654, 108);
             groupBox3.Name = "groupBox3";
             groupBox3.Size = new Size(366, 155);
             groupBox3.TabIndex = 3;
@@ -144,7 +147,7 @@
             // 
             btnOpenFile.BackColor = Color.Red;
             btnOpenFile.Font = new Font("한컴 말랑말랑 Bold", 16.1249981F, FontStyle.Bold, GraphicsUnit.Point, 129);
-            btnOpenFile.Location = new Point(1045, 135);
+            btnOpenFile.Location = new Point(1040, 135);
             btnOpenFile.Name = "btnOpenFile";
             btnOpenFile.Size = new Size(135, 114);
             btnOpenFile.TabIndex = 4;
@@ -155,7 +158,7 @@
             // 
             btnSaveFile.BackColor = Color.DodgerBlue;
             btnSaveFile.Font = new Font("한컴 말랑말랑 Bold", 16.1249981F, FontStyle.Bold, GraphicsUnit.Point, 129);
-            btnSaveFile.Location = new Point(1208, 135);
+            btnSaveFile.Location = new Point(1181, 135);
             btnSaveFile.Name = "btnSaveFile";
             btnSaveFile.Size = new Size(135, 114);
             btnSaveFile.TabIndex = 5;
@@ -170,6 +173,9 @@
             picCanvas.Size = new Size(1403, 485);
             picCanvas.TabIndex = 6;
             picCanvas.TabStop = false;
+            picCanvas.MouseDown += picCanvas_MouseDown;
+            picCanvas.MouseMove += picCanvas_MouseMove;
+            picCanvas.MouseUp += picCanvas_MouseUp;
             // 
             // Form1
             // 
