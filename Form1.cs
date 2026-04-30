@@ -11,7 +11,7 @@ namespace SimplePaint
     {
         enum ToolType { Line, Rectangle, Circle }  // 사용할도형타입
 
-        private Bitmap canvasBitmap; // 실제그림이저장되는비트맵
+        private Bitmap canvasBitmap; // 실제그림이저장되는비트맵!
         private Graphics canvasGraphics; // 비트맵위에그리기위한객체
 
         private bool isDrawing = false; // 현재드래그중인지여부!
