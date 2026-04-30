@@ -44,7 +44,8 @@ namespace SimplePaint
             btnLine.Click += btnLine_Click;
             btnRectangle.Click += btnRectangle_Click;
             btnCircle.Click += btnCircle_Click;
-            btnSaveFile.Click += btnSaveFile_Click;
+            //btnSaveFile.Click += btnSaveFile_Click;
+
 
             // --- 색상 콤보박스 설정 및 이벤트 연결 ---
             cmbColor.Items.AddRange(new object[] { }); // 예시: 항목이 없을 경우 추가
@@ -186,41 +187,44 @@ namespace SimplePaint
             // 파일 저장 대화상자 객체 생성 및 설정
             using (SaveFileDialog saveFileDialog = new SaveFileDialog())
             {
-                // 사용자가 선택할 수 있는 파일 형식 제한 (설명|확장자)
+                // 파일 확장자 필터 설정 및 기본 저장 옵션 정의[cite: 1, 2]
                 saveFileDialog.Filter = "PNG Image|*.png|JPeg Image|*.jpg|Bitmap Image|*.bmp";
                 saveFileDialog.Title = "그림 저장하기";
-                saveFileDialog.FileName = "SimplePaint_Image"; // 초기 파일명 설정
+                saveFileDialog.FileName = "SimplePaint_Image";
 
-                // 사용자가 '저장' 버튼을 눌렀을 때만 실행
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
+                    // 빈 경로가 넘어올 경우를 대비한 방어 코드
+                    if (string.IsNullOrEmpty(saveFileDialog.FileName)) return;
+
                     try
                     {
-                        string filePath = saveFileDialog.FileName; // 저장할 전체 경로 가져오기
-                        ImageFormat format = ImageFormat.Png;    // 기본 저장 포맷을 PNG로 설정
+                        string filePath = saveFileDialog.FileName;
+                        ImageFormat format = ImageFormat.Png; // 기본 포맷 설정
 
-                        // 파일의 확장자를 추출하여 소문자로 변환 후 비교
+                        // 파일 확장자(Extension)를 판별하여 해당 포맷으로 할당[cite: 2]
                         string extension = System.IO.Path.GetExtension(filePath).ToLower();
                         switch (extension)
                         {
                             case ".jpg":
                             case ".jpeg":
-                                format = ImageFormat.Jpeg; // JPG 포맷 설정
+                                format = ImageFormat.Jpeg;
                                 break;
                             case ".bmp":
-                                format = ImageFormat.Bmp;  // BMP 포맷 설정
+                                format = ImageFormat.Bmp;
                                 break;
                         }
 
-                        // 메모리에 있는 canvasBitmap을 지정된 경로와 포맷으로 실제 파일 저장
+                        // 현재 메모리상의 캔버스 비트맵을 물리적 파일로 저장[cite: 1, 2]
                         canvasBitmap.Save(filePath, format);
 
-                        MessageBox.Show("이미지가 성공적으로 저장되었습니다!", "저장 완료");
+                        // 저장 성공 후 사용자에게 처리 결과 알림[cite: 1]
+                        MessageBox.Show($"{System.IO.Path.GetFileName(filePath)} 저장 완료!", "알림");
                     }
                     catch (Exception ex)
                     {
-                        // 권한 부족이나 파일 사용 중 등 예외 상황 발생 시 메시지 출력
-                        MessageBox.Show($"저장 중 오류가 발생했습니다: {ex.Message}", "오류");
+                        // 파일 접근 권한 등 저장 실패 시 예외 메시지 출력[cite: 1]
+                        MessageBox.Show("저장 중 오류 발생: " + ex.Message, "오류");
                     }
                 }
             }
