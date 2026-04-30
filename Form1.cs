@@ -183,21 +183,45 @@ namespace SimplePaint
 
         private void btnSaveFile_Click(object sender, EventArgs e)
         {
-            // SaveFileDialog 객체 생성[cite: 2]
+            // 파일 저장 대화상자 객체 생성 및 설정
             using (SaveFileDialog saveFileDialog = new SaveFileDialog())
             {
-                // 파일 필터 설정 (사용자가 선택할 수 있는 확장자 제한)
+                // 사용자가 선택할 수 있는 파일 형식 제한 (설명|확장자)
                 saveFileDialog.Filter = "PNG Image|*.png|JPeg Image|*.jpg|Bitmap Image|*.bmp";
                 saveFileDialog.Title = "그림 저장하기";
-                saveFileDialog.FileName = "SimplePaint_Image"; // 기본 파일 이름
+                saveFileDialog.FileName = "SimplePaint_Image"; // 초기 파일명 설정
 
-                // 사용자가 '확인'을 눌렀을 때만 로직 실행[cite: 2]
+                // 사용자가 '저장' 버튼을 눌렀을 때만 실행
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    
-                    // 현재는 경로가 정상적으로 잡히는지 메시지 박스로 확인합니다.
-                    string filePath = saveFileDialog.FileName;
-                    MessageBox.Show($"{filePath}에 저장을 준비합니다.", "저장 대화상자 확인");
+                    try
+                    {
+                        string filePath = saveFileDialog.FileName; // 저장할 전체 경로 가져오기
+                        ImageFormat format = ImageFormat.Png;    // 기본 저장 포맷을 PNG로 설정
+
+                        // 파일의 확장자를 추출하여 소문자로 변환 후 비교
+                        string extension = System.IO.Path.GetExtension(filePath).ToLower();
+                        switch (extension)
+                        {
+                            case ".jpg":
+                            case ".jpeg":
+                                format = ImageFormat.Jpeg; // JPG 포맷 설정
+                                break;
+                            case ".bmp":
+                                format = ImageFormat.Bmp;  // BMP 포맷 설정
+                                break;
+                        }
+
+                        // 메모리에 있는 canvasBitmap을 지정된 경로와 포맷으로 실제 파일 저장
+                        canvasBitmap.Save(filePath, format);
+
+                        MessageBox.Show("이미지가 성공적으로 저장되었습니다!", "저장 완료");
+                    }
+                    catch (Exception ex)
+                    {
+                        // 권한 부족이나 파일 사용 중 등 예외 상황 발생 시 메시지 출력
+                        MessageBox.Show($"저장 중 오류가 발생했습니다: {ex.Message}", "오류");
+                    }
                 }
             }
         }
